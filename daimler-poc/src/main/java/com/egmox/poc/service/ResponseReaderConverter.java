@@ -45,17 +45,16 @@ public class ResponseReaderConverter extends AbstractManagement {
 		APIResponse evChargingResponse = responseReaderConverter.getEvCharging(apiKey, search);
 		ArrayList<Object> evChargingResponseArray = null;
 		if (evChargingResponse.getStatus() == 200) {
-			parkingResponseArray = (ArrayList<Object>)evChargingResponse.getResult();
+			evChargingResponseArray = (ArrayList<Object>)evChargingResponse.getResult();
 		}
 		
 		APIResponse restaurantResponse = responseReaderConverter.getRestaurant(apiKey, search);
 		ArrayList<Object> restaurantResponseArray = null;
 		if (restaurantResponse.getStatus() == 200) {
-			parkingResponseArray = (ArrayList<Object>)restaurantResponse.getResult();
+			restaurantResponseArray = (ArrayList<Object>)restaurantResponse.getResult();
 		}
 
-		ArrayList<Object> resultList = new ArrayList<>();
-		resultList.add(resultListBuilder(parkingResponseArray, evChargingResponseArray, restaurantResponseArray));
+		ArrayList<Object> resultList = resultListBuilder(parkingResponseArray, evChargingResponseArray, restaurantResponseArray);
 
 		response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
 				parkingResponseArray);
@@ -64,17 +63,8 @@ public class ResponseReaderConverter extends AbstractManagement {
 
 	@Async
 	public APIResponse getParking(String apiKey, SearchDTO search) {
-		HttpHeaders headers = new HttpHeaders();
 		APIResponse internalResponse = null;
-		headers.add("api-key", apiKey);
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("lat", search.getLat());
-		jsonObject.put("lon", search.getLon());
-
-		HttpEntity<String> entity = new HttpEntity<String>(jsonObject.toString(), headers);
+		HttpEntity<String> entity = new HttpEntity<String>(bodyCreator(search), headerCreator(apiKey));
 		ResponseEntity<String> result = restTemplate.exchange(getVariable(GenericConstants.PARKING_URL),
 				HttpMethod.POST, entity, String.class);
 
@@ -91,40 +81,53 @@ public class ResponseReaderConverter extends AbstractManagement {
 
 	@Async
 	private APIResponse getEvCharging(String apiKey, SearchDTO search) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("api-key", apiKey);
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		APIResponse internalResponse = null;
+		HttpEntity<String> entity = new HttpEntity<String>(bodyCreator(search), headerCreator(apiKey));
+		ResponseEntity<String> result = restTemplate.exchange(getVariable(GenericConstants.EV_CHARGING_URL),
+				HttpMethod.POST, entity, String.class);
 
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("lat", search.getLat());
-		jsonObject.put("lon", search.getLon());
+		JSONArray jsonArray = (JSONArray) JsonPath.read(result.getBody(), GenericConstants.RESULT_PATH);
+		ArrayList<Object> placesList = new ArrayList<>();
+		for (int i = 0; i < jsonArray.size(); placesList.add(jsonArray.get(i++)))
+			;
 
-		HttpEntity<String> entity = new HttpEntity<String>(jsonObject.toString(), headers);
-		ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
-		response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK), result);
+		internalResponse = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
+				placesList);
 		log.info(result.toString());
-		return response;
+		return internalResponse;
 	}
 
 	@Async
 	private APIResponse getRestaurant(String apiKey, SearchDTO search) {
+		APIResponse internalResponse = null;
+		HttpEntity<String> entity = new HttpEntity<String>(bodyCreator(search), headerCreator(apiKey));
+		ResponseEntity<String> result = restTemplate.exchange(getVariable(GenericConstants.RESTAURANT_URL),
+				HttpMethod.POST, entity, String.class);
+
+		JSONArray jsonArray = (JSONArray) JsonPath.read(result.getBody(), GenericConstants.RESULT_PATH);
+		ArrayList<Object> placesList = new ArrayList<>();
+		for (int i = 0; i < jsonArray.size(); placesList.add(jsonArray.get(i++)))
+			;
+
+		internalResponse = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
+				placesList);
+		log.info(result.toString());
+		return internalResponse;
+	}
+	
+	private HttpHeaders headerCreator(String apiKey) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("api-key", apiKey);
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
+		return headers;
+	}
+	
+	private String bodyCreator(SearchDTO search) {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("lat", search.getLat());
 		jsonObject.put("lon", search.getLon());
-
-		HttpEntity<String> entity = new HttpEntity<String>(jsonObject.toString(), headers);
-		ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
-		response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK), result);
-		log.info(result.toString());
-		return response;
+		return jsonObject.toString();
 	}
 
 	private ArrayList<Object> resultListBuilder(ArrayList<Object>... list) {
@@ -138,5 +141,4 @@ public class ResponseReaderConverter extends AbstractManagement {
 		}
 		return resultSet;
 	}
-
 }

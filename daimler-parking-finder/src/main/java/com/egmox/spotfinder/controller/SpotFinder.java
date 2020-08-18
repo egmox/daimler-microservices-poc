@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.egmox.spotfinder.constants.GenericConstants;
 import com.egmox.spotfinder.constants.RestUriConstants;
 import com.egmox.spotfinder.dto.APIResponse;
 import com.egmox.spotfinder.dto.SearchDTO;
