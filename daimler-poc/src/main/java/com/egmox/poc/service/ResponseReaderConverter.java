@@ -17,11 +17,12 @@ import org.springframework.web.client.RestTemplate;
 import com.egmox.poc.constants.GenericConstants;
 import com.egmox.poc.constants.MessageConstants;
 import com.egmox.poc.dto.APIResponse;
-import com.egmox.poc.dto.ResultObject;
 import com.egmox.poc.dto.SearchDTO;
 import com.egmox.poc.management.AbstractManagement;
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 
 @Service
 @Slf4j
@@ -35,18 +36,25 @@ public class ResponseReaderConverter extends AbstractManagement {
 	APIResponse response = null;
 
 	public APIResponse getResponse(SearchDTO search, String apiKey) {
-		ArrayList<ResultObject> resultList = new ArrayList<>();
-		Object parkingObj = responseReaderConverter.getParking(apiKey, search);
+		APIResponse parkingResponse = responseReaderConverter.getParking(apiKey, search);
+		JSONArray parkingResponseArray = null;
+		if(parkingResponse.getStatus()!=200) {
+			parkingResponseArray = (JSONArray)parkingResponse.getResult();
+		}
 //		Object evCharObject = responseReaderConverter.getEvCharging(apiKey, search);
 //		Object restaurantObject = responseReaderConverter.getEvCharging(apiKey, search);
-		response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
-				parkingObj);
+		
+		
+		
+//		response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
+//				parkingResponse);
 		return response;
 	}
 
 	@Async
 	public APIResponse getParking(String apiKey, SearchDTO search) {
 		HttpHeaders headers = new HttpHeaders();
+		APIResponse internalResponse = null;
 		headers.add("api-key", apiKey);
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -59,13 +67,17 @@ public class ResponseReaderConverter extends AbstractManagement {
 		ResponseEntity<String> result = restTemplate.exchange(getVariable(GenericConstants.PARKING_URL),
 				HttpMethod.POST, entity, String.class);
 
-		response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK), result);
+		JSONArray jsonArray = (JSONArray)JsonPath.read(result.getBody(), GenericConstants.RESULT_PATH);
+		ArrayList<Object> placesList = new ArrayList<>();
+		for (int i = 0; i < jsonArray.size(); placesList.add(jsonArray.get(i++)));
+		
+		internalResponse = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK), placesList);
 		log.info(result.toString());
-		return response;
+		return internalResponse;
 	}
 
 	@Async
-	public APIResponse getEvCharging(String apiKey, SearchDTO search) {
+	private APIResponse getEvCharging(String apiKey, SearchDTO search) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("api-key", apiKey);
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -84,7 +96,7 @@ public class ResponseReaderConverter extends AbstractManagement {
 	}
 
 	@Async
-	public APIResponse getRestaurant(String apiKey, SearchDTO search) {
+	private APIResponse getRestaurant(String apiKey, SearchDTO search) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("api-key", apiKey);
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -102,4 +114,9 @@ public class ResponseReaderConverter extends AbstractManagement {
 		return response;
 	}
 
+	private ArrayList<Object> listBuilder(APIResponse...apiResponses){
+		
+		return null;
+	}
+	
 }
