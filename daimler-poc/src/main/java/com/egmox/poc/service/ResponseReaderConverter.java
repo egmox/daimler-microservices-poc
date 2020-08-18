@@ -39,12 +39,23 @@ public class ResponseReaderConverter extends AbstractManagement {
 		APIResponse parkingResponse = responseReaderConverter.getParking(apiKey, search);
 		ArrayList<Object> parkingResponseArray = null;
 		if (parkingResponse.getStatus() == 200) {
-			parkingResponseArray = (ArrayList)parkingResponse.getResult();
+			parkingResponseArray = (ArrayList<Object>)parkingResponse.getResult();
 		}
+
+		APIResponse evChargingResponse = responseReaderConverter.getEvCharging(apiKey, search);
+		ArrayList<Object> evChargingResponseArray = null;
+		if (evChargingResponse.getStatus() == 200) {
+			parkingResponseArray = (ArrayList<Object>)evChargingResponse.getResult();
+		}
+		
+		APIResponse restaurantResponse = responseReaderConverter.getRestaurant(apiKey, search);
+		ArrayList<Object> restaurantResponseArray = null;
+		if (restaurantResponse.getStatus() == 200) {
+			parkingResponseArray = (ArrayList<Object>)restaurantResponse.getResult();
+		}
+
 		ArrayList<Object> resultList = new ArrayList<>();
-//		resultList.add(resultListBuilder(parkingResponseArray));
-//		Object evCharObject = responseReaderConverter.getEvCharging(apiKey, search);
-//		Object restaurantObject = responseReaderConverter.getEvCharging(apiKey, search);
+		resultList.add(resultListBuilder(parkingResponseArray, evChargingResponseArray, restaurantResponseArray));
 
 		response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
 				parkingResponseArray);
@@ -117,10 +128,15 @@ public class ResponseReaderConverter extends AbstractManagement {
 	}
 
 	private ArrayList<Object> resultListBuilder(ArrayList<Object>... list) {
-		for(int i=0; i<list.length; i++) {
-//			for(int j=0; j<jsonArrays[i])
+		ArrayList<Object> resultSet = new ArrayList<>();
+		ArrayList<Object> resultObject = new ArrayList<>();
+		int largestList = Math.max(list[0].size(), Math.max(list[1].size(), list[2].size()));
+		for(int i=0; i<largestList; i++) {
+			for(int j=0; j<list.length; j++) 
+			resultObject.add(list[j].get(i));
+		resultSet.add(resultObject);
 		}
-		return null;
+		return resultSet;
 	}
 
 }
