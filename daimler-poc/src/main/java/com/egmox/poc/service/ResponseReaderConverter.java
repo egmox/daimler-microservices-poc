@@ -37,17 +37,17 @@ public class ResponseReaderConverter extends AbstractManagement {
 
 	public APIResponse getResponse(SearchDTO search, String apiKey) {
 		APIResponse parkingResponse = responseReaderConverter.getParking(apiKey, search);
-		JSONArray parkingResponseArray = null;
-		if (parkingResponse.getStatus() != 200) {
-			parkingResponseArray = (JSONArray) parkingResponse.getResult();
+		ArrayList<Object> parkingResponseArray = null;
+		if (parkingResponse.getStatus() == 200) {
+			parkingResponseArray = (ArrayList)parkingResponse.getResult();
 		}
 		ArrayList<Object> resultList = new ArrayList<>();
-		resultList.add(resultListBuilder(parkingResponseArray));
+//		resultList.add(resultListBuilder(parkingResponseArray));
 //		Object evCharObject = responseReaderConverter.getEvCharging(apiKey, search);
 //		Object restaurantObject = responseReaderConverter.getEvCharging(apiKey, search);
 
-//		response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
-//				parkingResponse);
+		response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
+				parkingResponseArray);
 		return response;
 	}
 
@@ -116,8 +116,8 @@ public class ResponseReaderConverter extends AbstractManagement {
 		return response;
 	}
 
-	private ArrayList<Object> resultListBuilder(JSONArray... jsonArrays) {
-		for(int i=0; i<jsonArrays.length; i++) {
+	private ArrayList<Object> resultListBuilder(ArrayList<Object>... list) {
+		for(int i=0; i<list.length; i++) {
 //			for(int j=0; j<jsonArrays[i])
 		}
 		return null;
