@@ -27,7 +27,7 @@ import net.minidev.json.JSONArray;
 @Service
 @Slf4j
 public class ResponseReaderConverter extends AbstractManagement {
-	
+
 	@Autowired
 	ResponseReaderConverter responseReaderConverter;
 
@@ -38,14 +38,13 @@ public class ResponseReaderConverter extends AbstractManagement {
 	public APIResponse getResponse(SearchDTO search, String apiKey) {
 		APIResponse parkingResponse = responseReaderConverter.getParking(apiKey, search);
 		JSONArray parkingResponseArray = null;
-		if(parkingResponse.getStatus()!=200) {
-			parkingResponseArray = (JSONArray)parkingResponse.getResult();
+		if (parkingResponse.getStatus() != 200) {
+			parkingResponseArray = (JSONArray) parkingResponse.getResult();
 		}
+		
 //		Object evCharObject = responseReaderConverter.getEvCharging(apiKey, search);
 //		Object restaurantObject = responseReaderConverter.getEvCharging(apiKey, search);
-		
-		
-		
+
 //		response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
 //				parkingResponse);
 		return response;
@@ -67,11 +66,13 @@ public class ResponseReaderConverter extends AbstractManagement {
 		ResponseEntity<String> result = restTemplate.exchange(getVariable(GenericConstants.PARKING_URL),
 				HttpMethod.POST, entity, String.class);
 
-		JSONArray jsonArray = (JSONArray)JsonPath.read(result.getBody(), GenericConstants.RESULT_PATH);
+		JSONArray jsonArray = (JSONArray) JsonPath.read(result.getBody(), GenericConstants.RESULT_PATH);
 		ArrayList<Object> placesList = new ArrayList<>();
-		for (int i = 0; i < jsonArray.size(); placesList.add(jsonArray.get(i++)));
-		
-		internalResponse = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK), placesList);
+		for (int i = 0; i < jsonArray.size(); placesList.add(jsonArray.get(i++)))
+			;
+
+		internalResponse = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
+				placesList);
 		log.info(result.toString());
 		return internalResponse;
 	}
@@ -114,9 +115,9 @@ public class ResponseReaderConverter extends AbstractManagement {
 		return response;
 	}
 
-	private ArrayList<Object> listBuilder(APIResponse...apiResponses){
-		
+	private ArrayList<Object> listBuilder(APIResponse... apiResponses) {
+
 		return null;
 	}
-	
+
 }
