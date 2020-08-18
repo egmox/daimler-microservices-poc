@@ -1,5 +1,6 @@
 package com.egmox.spotfinder.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -16,8 +17,10 @@ import com.egmox.spotfinder.constants.MessageConstants;
 import com.egmox.spotfinder.dto.APIResponse;
 import com.egmox.spotfinder.dto.SearchDTO;
 import com.egmox.spotfinder.management.AbstractManagement;
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 
 @Service
 @Slf4j
@@ -48,16 +51,21 @@ public class SpotResponseReaderConverter extends AbstractManagement {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		HttpEntity<String> entity = new HttpEntity<String>("", headers);
-		JSONObject jsonObject = null;
 
 		ResponseEntity<String> result;
 		try {
 			result = restTemplate.exchange(urlFormed, HttpMethod.GET, entity, String.class);
 			log.info(result.toString());
 			String resultBody = result.getBody();
-			jsonObject = new JSONObject(resultBody);
+
+			JSONArray jsonArray = JsonPath.read(resultBody, "$.results.items");
+
+			ArrayList<JSONObject> placesList = new ArrayList<>();
+			for (int i = 0; i < jsonArray.size(); placesList.add((JSONObject) jsonArray.get(i++)))
+				;
+
 			response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
-					result);
+					placesList);
 		} catch (Exception e) {
 			e.printStackTrace();
 			response = new APIResponse(MessageConstants.NO_LOCATION_ENTERED_CODE,

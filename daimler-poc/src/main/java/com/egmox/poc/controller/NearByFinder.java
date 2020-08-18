@@ -30,7 +30,6 @@ public class NearByFinder {
 	@PostMapping(RestUriConstants.FIND)
 	public APIResponse getNearbyPlaces(@RequestBody SearchDTO search, @RequestHeader(value = "api-key") String apiKey) {
 		log.info("starting to search");
-		log.info("header123: " + apiKey);
 		return responseReaderConverter.getResponse(search, apiKey);
 	}
 }
