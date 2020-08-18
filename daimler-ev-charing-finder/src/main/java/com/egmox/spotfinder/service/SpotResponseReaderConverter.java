@@ -3,7 +3,6 @@ package com.egmox.spotfinder.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -37,7 +36,6 @@ public class SpotResponseReaderConverter extends AbstractManagement {
 			response = new APIResponse(MessageConstants.UNAUTHORIZED_CODE, getMessage(MessageConstants.UNAUTHORIZED));
 			return response;
 		}
-
 		if (isEmpty(search.getLat()) && isEmpty(search.getLon())) {
 			response = new APIResponse(MessageConstants.NO_LOCATION_ENTERED_CODE,
 					getMessage(MessageConstants.NO_LOCATION_ENTERED));
@@ -58,11 +56,9 @@ public class SpotResponseReaderConverter extends AbstractManagement {
 			log.info(result.toString());
 			String resultBody = result.getBody();
 
-			JSONArray jsonArray = JsonPath.read(resultBody, "$.results.items");
-
-			ArrayList<JSONObject> placesList = new ArrayList<>();
-			for (int i = 0; i < jsonArray.size(); placesList.add((JSONObject) jsonArray.get(i++)))
-				;
+			JSONArray jsonArray = (JSONArray)JsonPath.read(resultBody, "$.results.items");
+			ArrayList<Object> placesList = new ArrayList<>();
+			for (int i = 0; i < jsonArray.size(); placesList.add(jsonArray.get(i++)));
 
 			response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
 					placesList);

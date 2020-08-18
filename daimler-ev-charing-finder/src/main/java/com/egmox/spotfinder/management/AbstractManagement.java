@@ -15,8 +15,8 @@ public class AbstractManagement {
 	Environment env;
 
 	public String getMessage(String messageCode) {
-		messageSource.getMessage(messageCode, null, messageCode, Locale.getDefault());
-		return null;
+		
+		return messageSource.getMessage(messageCode, null, messageCode, Locale.getDefault());
 	}
 
 	public String getVariable(String environmenrVariableCode) {

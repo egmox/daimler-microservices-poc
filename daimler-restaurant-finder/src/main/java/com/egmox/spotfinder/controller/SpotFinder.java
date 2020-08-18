@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.egmox.spotfinder.constants.GenericConstants;
 import com.egmox.spotfinder.constants.RestUriConstants;
 import com.egmox.spotfinder.dto.APIResponse;
 import com.egmox.spotfinder.dto.SearchDTO;
@@ -16,7 +15,7 @@ import com.egmox.spotfinder.service.SpotResponseReaderConverter;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping(RestUriConstants.NEARBY_PARKING)
+@RequestMapping(RestUriConstants.NEARBY_RESTAURANT)
 @Slf4j
 public class SpotFinder {
 	APIResponse response = new APIResponse();

@@ -41,7 +41,8 @@ public class ResponseReaderConverter extends AbstractManagement {
 		if (parkingResponse.getStatus() != 200) {
 			parkingResponseArray = (JSONArray) parkingResponse.getResult();
 		}
-		
+		ArrayList<Object> resultList = new ArrayList<>();
+		resultList.add(resultListBuilder(parkingResponseArray));
 //		Object evCharObject = responseReaderConverter.getEvCharging(apiKey, search);
 //		Object restaurantObject = responseReaderConverter.getEvCharging(apiKey, search);
 
@@ -115,8 +116,10 @@ public class ResponseReaderConverter extends AbstractManagement {
 		return response;
 	}
 
-	private ArrayList<Object> listBuilder(APIResponse... apiResponses) {
-
+	private ArrayList<Object> resultListBuilder(JSONArray... jsonArrays) {
+		for(int i=0; i<jsonArrays.length; i++) {
+//			for(int j=0; j<jsonArrays[i])
+		}
 		return null;
 	}
 
