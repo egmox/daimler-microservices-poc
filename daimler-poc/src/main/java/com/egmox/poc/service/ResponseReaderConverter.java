@@ -57,7 +57,7 @@ public class ResponseReaderConverter extends AbstractManagement {
 		ArrayList<Object> resultList = resultListBuilder(parkingResponseArray, evChargingResponseArray, restaurantResponseArray);
 
 		response = new APIResponse(MessageConstants.RESPONSE_OK_CODE, getMessage(MessageConstants.RESPONSE_OK),
-				parkingResponseArray);
+				resultList);
 		return response;
 	}
 
